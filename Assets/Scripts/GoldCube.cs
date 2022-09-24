@@ -1,10 +1,12 @@
 using System;
 using UnityEngine;
 
-public class GoldCube : MonoBehaviour
+namespace justDice_IdleClickerTest
 {
-    private void OnMouseDown()
+    public class GoldCube : MonoBehaviour
     {
-        
+        private void OnMouseDown()
+        {
+        }
     }
 }

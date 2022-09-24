@@ -1,14 +1,17 @@
 using UnityEngine;
 
-public class Singleton<T> : MonoBehaviour where T : Singleton<T>
+namespace justDice_IdleClickerTest
 {
-    private static T Instance = null;
-
-    public  void Awake()
+    public class Singleton<T> : MonoBehaviour where T : Singleton<T>
     {
-        if (Instance == null)
+        protected static T Instance = null;
+        
+        public void Awake()
         {
-            Instance = this as T;
+            if (Instance == null)
+            {
+                Instance = this as T;
+            }
         }
     }
 }
