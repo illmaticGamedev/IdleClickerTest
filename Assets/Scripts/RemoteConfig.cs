@@ -1,9 +1,6 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -24,23 +21,16 @@ namespace justDice_IdleClickerTest
 
         IEnumerator GetConfig(string url)
         {
+            yield return new WaitForSecondsRealtime(0.1f);
+            
             UnityWebRequest request = UnityWebRequest.Get(url);
             yield return request.SendWebRequest();
             
             if (request.result == UnityWebRequest.Result.Success)
             {
-                Debug.Log("json content: " + request.downloadHandler.text);
-                try
-                {
-                    var newConfig = JsonConvert.DeserializeObject<ConfigModel>(request.downloadHandler.text);
-                    GameManager.Instance.LoadConfigFromRemoteFile(newConfig);
-                    UIController.Instance.RemoveConfigFetchScreen(true);
-                }
-                catch
-                {
-                    new Exception("Something wrong with JsonFile");
-                    UIController.Instance.RemoveConfigFetchScreen(false);
-                }
+                var newConfig = JsonConvert.DeserializeObject<ConfigModel>(request.downloadHandler.text);
+                GameManager.Instance.LoadConfigFromRemoteFile(newConfig);
+                UIController.Instance.RemoveConfigFetchScreen(true);
             }
             else
             {
@@ -50,6 +40,7 @@ namespace justDice_IdleClickerTest
         }
     }
 
+    // Model for json file in the remote config file - has to match all the elements,if wrong file, game will use default files.
     public struct ConfigModel
     {
         public string BaseAttackRewardGold { get; set; }

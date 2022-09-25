@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 
 namespace justDice_IdleClickerTest
@@ -11,8 +12,9 @@ namespace justDice_IdleClickerTest
         [SerializeField] double goldPerTap = 0;
         [SerializeField] double tapUpgradeCost = 0;
 
-        [Header("Attacker Config")]
-        [SerializeField] double attackerBuyCost = 100;
+        [FormerlySerializedAs("attackerBuyCost")]
+        [SerializeField] double attackerBaseBuyCost = 100;
+        [SerializeField] double attackerBuyCost;
         [SerializeField] double attackerBuyingCostMultiplier = 10;
         
         [Header("Math Setup - Tap")]
@@ -31,8 +33,15 @@ namespace justDice_IdleClickerTest
         
         //Remote Data
         [HideInInspector] public ConfigModel _ConfigModel = new ConfigModel();
+        
+        //Saving Data - playerpref names
+        private string savedTapLevel = "TapLevel";
+        private string savedCurrentGold = "CurrentGold";
+        private string savedAttackerBuyingCost = "AttackerBuyingCost";
+
         void Start()
         {
+            loadData();
             updateGoldPerTapAndUpgradeCost();
         }
         
@@ -50,7 +59,7 @@ namespace justDice_IdleClickerTest
             return false;
         }
 
-        public void VerifyGoldForBuyingAttacker()
+        void verifyGoldForBuyingAttacker()
         {
             if (currentGold >= attackerBuyCost)
             {
@@ -66,17 +75,48 @@ namespace justDice_IdleClickerTest
             }
             else
             {
+                bool arrayValid = false;
                 foreach (var item in attackerBuyBtns)
                 {
-                    if(item != null)
+                    if (item != null)
+                    {
                         item.gameObject.SetActive(false);
+                    }
+                }
+
+                foreach (var item in attackerBuyBtns)
+                {
+                    if (item != null)
+                    {
+                        arrayValid = true;
+                        break;
+                    }
                 }
                 
-                if(attackerBuyBtns.Length > 0)
+                if(attackerBuyBtns.Length > 0 && arrayValid)
                     UIController.Instance.SetAttackerStateAndValue(attackerBuyCost.ToString(), true);
             }
         }
+        
+        void saveData()
+        {
+            PlayerPrefs.SetInt(savedTapLevel, tapCurrentLevel);
+            PlayerPrefs.SetString(savedCurrentGold, currentGold.ToString());
+            PlayerPrefs.SetString(savedAttackerBuyingCost, attackerBuyCost.ToString());
+        }
 
+        void loadData()
+        {
+            if (PlayerPrefs.HasKey(savedCurrentGold))
+            {
+                tapCurrentLevel = PlayerPrefs.GetInt(savedTapLevel);
+                currentGold = float.Parse(PlayerPrefs.GetString(savedCurrentGold));
+                attackerBuyCost = float.Parse(PlayerPrefs.GetString(savedAttackerBuyingCost));
+                UIController.Instance.SetLevelText(tapCurrentLevel);
+                UpdateGold(0);
+            }
+        }
+        
         public void OnAttackerBought(BuyAttackerButton boughtAttackerBtn)
         {
             for (int i = 0; i < attackerBuyBtns.Length; i++)
@@ -89,7 +129,7 @@ namespace justDice_IdleClickerTest
                 }
             }
             
-            VerifyGoldForBuyingAttacker();
+            verifyGoldForBuyingAttacker();
             UpdateGold(-attackerBuyCost);
             attackerBuyCost *= attackerBuyingCostMultiplier;
         }
@@ -108,7 +148,8 @@ namespace justDice_IdleClickerTest
             UIController.Instance.SetCurrentGold(currentGold);
             effects.PlayTapEffects(directHit);
             goldDropObjectPool.DropCoin();
-            VerifyGoldForBuyingAttacker();
+            verifyGoldForBuyingAttacker();
+            saveData();
         }
 
         public void UpdateGold(double change)
@@ -127,20 +168,28 @@ namespace justDice_IdleClickerTest
                 
                 UIController.Instance.SetLevelText(tapCurrentLevel);
                 UIController.Instance.SetCurrentGold((int)currentGold);
-                VerifyGoldForBuyingAttacker();
+                verifyGoldForBuyingAttacker();
             }
         }
 
         public void LoadConfigFromRemoteFile(ConfigModel configModel)
         {
             _ConfigModel = configModel;
-            attackerBuyCost = float.Parse(_ConfigModel.AttackerBaseBuyCost);
+            attackerBaseBuyCost = float.Parse(_ConfigModel.AttackerBaseBuyCost);
             attackerBuyingCostMultiplier = float.Parse(_ConfigModel.AttackerBuyingCostMultiplier);
             baseTapGold = float.Parse(_ConfigModel.BaseTapGold);
             upgradeSquaredMultiplier = float.Parse(_ConfigModel.TapGoldSquaredValue);
             baseUpgradeCost = float.Parse(_ConfigModel.TapBaseUpgradeCost);
             upgradeCostMultiplier = float.Parse(_ConfigModel.TapUpgradeCostMultiplier);
             
+            updateGoldPerTapAndUpgradeCost();
+        }
+        
+        [ContextMenu("DELETE ALL SAVED DATA")]
+        public void DeleteAllPrefs()
+        {
+            PlayerPrefs.DeleteAll();
+            SceneManager.LoadScene("Game");
         }
         
     }
