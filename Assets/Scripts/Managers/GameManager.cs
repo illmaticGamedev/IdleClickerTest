@@ -140,6 +140,7 @@ namespace justDice_IdleClickerTest
             upgradeSquaredMultiplier = float.Parse(_ConfigModel.TapGoldSquaredValue);
             baseUpgradeCost = float.Parse(_ConfigModel.TapBaseUpgradeCost);
             upgradeCostMultiplier = float.Parse(_ConfigModel.TapUpgradeCostMultiplier);
+            
         }
         
     }

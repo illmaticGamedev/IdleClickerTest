@@ -18,9 +18,14 @@ namespace justDice_IdleClickerTest
         [Header("Attacker UI")]
         [SerializeField] GameObject attackerAvailableBanner;
         [SerializeField] TMP_Text txtAttackerCost;
+
+        [Header("Loading and Config")] 
+        [SerializeField] Animator waitForRemoteConfigCheck;
+        [SerializeField] TMP_Text txtConfigFetchStatus;
         
         private void Start()
         {
+            waitForRemoteConfigCheck.gameObject.SetActive(true);
             setButtonEvents();
         }
         
@@ -57,6 +62,22 @@ namespace justDice_IdleClickerTest
         {
             txtCurrentGold.text = Math.Round(currentGold).ToString();
             upgradeButtonState();
+        }
+
+        public void RemoveConfigFetchScreen(bool success)
+        {
+            Time.timeScale = 1;
+            
+            if (success)
+            {
+                txtConfigFetchStatus.text = "Remote Config Fetched Successfully!";
+            }
+            else
+            {
+                txtConfigFetchStatus.text = "Remote Config Fetching Failed, Continuing with default settings.";
+            }
+            
+            waitForRemoteConfigCheck.Play("FadeOut");
         }
     }
 }
