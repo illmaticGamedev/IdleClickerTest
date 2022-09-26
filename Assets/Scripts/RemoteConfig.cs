@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.IO;
 using Newtonsoft.Json;
@@ -12,9 +13,6 @@ namespace justDice_IdleClickerTest
         
         void Start()
         {
-            string jsonTextRow = new StreamReader(Application.dataPath + "/Scripts/RemoteConfigJustDice.txt").ReadToEnd();
-            var newConfig = JsonConvert.DeserializeObject<ConfigModel>(jsonTextRow);
-            GameManager.Instance.LoadConfigFromRemoteFile(newConfig);
             StartCoroutine(GetConfig(fileURL));
             Time.timeScale = 0;
         }
@@ -28,9 +26,18 @@ namespace justDice_IdleClickerTest
             
             if (request.result == UnityWebRequest.Result.Success)
             {
-                var newConfig = JsonConvert.DeserializeObject<ConfigModel>(request.downloadHandler.text);
-                GameManager.Instance.LoadConfigFromRemoteFile(newConfig);
-                UIController.Instance.RemoveConfigFetchScreen(true);
+                try
+                {
+                    var newConfig = JsonConvert.DeserializeObject<ConfigModel>(request.downloadHandler.text);
+                    GameManager.Instance.LoadConfigFromRemoteFile(newConfig);
+                    UIController.Instance.RemoveConfigFetchScreen(true);
+                }
+                catch (Exception e)
+                {
+                    Debug.Log("Error: " + request.error);
+                    UIController.Instance.RemoveConfigFetchScreen(false);
+                }
+
             }
             else
             {

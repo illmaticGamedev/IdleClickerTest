@@ -38,9 +38,22 @@ namespace justDice_IdleClickerTest
         private string savedTapLevel = "TapLevel";
         private string savedCurrentGold = "CurrentGold";
         private string savedAttackerBuyingCost = "AttackerBuyingCost";
-
+        
         void Start()
         {
+            //Default Config Values (if remote fails), Would ideally keep it in a GLOBAL_SETTINGS class with all const variables.
+            _ConfigModel.AttackerBaseBuyCost = 100.ToString();
+            _ConfigModel.AttackerBuyingCostMultiplier = 10.ToString();
+            _ConfigModel.BaseTapGold = 5.ToString();
+            _ConfigModel.TapGoldSquaredValue = 2.1f.ToString();
+            _ConfigModel.TapBaseUpgradeCost = 5.ToString();
+            _ConfigModel.TapUpgradeCostMultiplier = 1.08.ToString();
+            _ConfigModel.AttackerBaseUpgradeCost = 100.ToString();
+            _ConfigModel.AttackDelayTime = 1.ToString();
+            _ConfigModel.BaseAttackRewardGold = 5.ToString();
+            _ConfigModel.AttackGoldRewardMultiplier = 2.1f.ToString();
+            _ConfigModel.AttackerBuyingCostMultiplier = 10.ToString();
+
             loadData();
             updateGoldPerTapAndUpgradeCost();
         }
@@ -181,6 +194,7 @@ namespace justDice_IdleClickerTest
             upgradeSquaredMultiplier = float.Parse(_ConfigModel.TapGoldSquaredValue);
             baseUpgradeCost = float.Parse(_ConfigModel.TapBaseUpgradeCost);
             upgradeCostMultiplier = float.Parse(_ConfigModel.TapUpgradeCostMultiplier);
+            
             
             updateGoldPerTapAndUpgradeCost();
         }
