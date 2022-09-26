@@ -9,7 +9,7 @@ namespace justDice_IdleClickerTest
 {
     public class RemoteConfig : MonoBehaviour
     {
-        private string fileURL = "https://drive.google.com/uc?export=download&id=12yER5n35P1xNOwIWBPXqiWilHee9wY57";
+        private string fileURL = "https://drive.google.com/uc?export=download&id=12yER5n35P1xNOwIWBPXqiWilHee9wY5";
         
         void Start()
         {
