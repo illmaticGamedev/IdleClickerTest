@@ -11,7 +11,7 @@ namespace justDice_IdleClickerTest
         [SerializeField] double goldPerTap = 0;
         [SerializeField] double tapUpgradeCost = 0;
 
-        [FormerlySerializedAs("attackerBuyCost")]
+        [Header("Attacker")]
         [SerializeField] double attackerBaseBuyCost = 100;
         [SerializeField] double attackerBuyCost;
         [SerializeField] double attackerBuyingCostMultiplier = 10;
