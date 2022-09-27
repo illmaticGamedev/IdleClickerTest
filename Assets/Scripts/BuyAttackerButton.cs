@@ -1,5 +1,3 @@
-using System;
-using justDice_IdleClickerTest;
 using UnityEngine;
 
 namespace justDice_IdleClickerTest

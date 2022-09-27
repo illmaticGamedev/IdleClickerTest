@@ -1,4 +1,3 @@
-using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
@@ -64,14 +63,6 @@ namespace justDice_IdleClickerTest
             tapUpgradeCost = Mathf.Pow(upgradeCostMultiplier * baseUpgradeCost, tapCurrentLevel);
         }
         
-        public bool EnoughGoldForTapUpgrade()
-        {
-            if (currentGold >= tapUpgradeCost)
-                return true;
-            
-            return false;
-        }
-
         void verifyGoldForBuyingAttacker()
         {
             if (currentGold >= attackerBuyCost)
@@ -183,6 +174,14 @@ namespace justDice_IdleClickerTest
                 UIController.Instance.SetCurrentGold((int)currentGold);
                 verifyGoldForBuyingAttacker();
             }
+        }
+        
+        public bool EnoughGoldForTapUpgrade()
+        {
+            if (currentGold >= tapUpgradeCost)
+                return true;
+            
+            return false;
         }
 
         public void LoadConfigFromRemoteFile(ConfigModel configModel)

@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.IO;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -34,6 +33,7 @@ namespace justDice_IdleClickerTest
                 }
                 catch (Exception e)
                 {
+                    Debug.Log("URL: " + fileURL);
                     Debug.Log("Error: " + request.error);
                     UIController.Instance.RemoveConfigFetchScreen(false);
                 }

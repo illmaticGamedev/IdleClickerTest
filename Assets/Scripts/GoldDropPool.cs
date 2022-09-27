@@ -1,8 +1,4 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Numerics;
-using System.Threading.Tasks;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using Vector3 = UnityEngine.Vector3;
@@ -16,6 +12,7 @@ namespace justDice_IdleClickerTest
         [SerializeField] private float coinDropSpeed;
         [SerializeField] private float coinDropHorizontalRange;
         [SerializeField] private float coinResetDistance = 8;
+        
         private void Start()
         {
             for (int i = 0; i < transform.childCount; i++)

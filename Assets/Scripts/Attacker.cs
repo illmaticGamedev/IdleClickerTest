@@ -1,4 +1,3 @@
-using System;
 using TMPro;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -98,19 +97,6 @@ namespace justDice_IdleClickerTest
             UpgradeAttack();
         }
 
-        public void UpgradeAttack()
-        {
-            if(GameManager.Instance.currentGold >= attackerUpgradeCost)
-            {
-                GameManager.Instance.UpdateGold(-attackerUpgradeCost);
-                
-                attackerLevel += 1;
-                attackerUpgradeCost *= attackerBuyingCostMultiplier;
-                attackerLevelText.text = "x" + attackerLevel;
-                currentGoldPerAttack = baseGoldPerAttack * Mathf.Pow(attackerLevel, attackerGoldMultiplier);
-            }
-        }
-
         void checkRemoteDataOrSetToDefault()
         {
             ConfigModel newConfig = GameManager.Instance._ConfigModel;
@@ -146,6 +132,19 @@ namespace justDice_IdleClickerTest
             else
             {
                 gameObject.SetActive(false);
+            }
+        }
+        
+        public void UpgradeAttack()
+        {
+            if(GameManager.Instance.currentGold >= attackerUpgradeCost)
+            {
+                GameManager.Instance.UpdateGold(-attackerUpgradeCost);
+                
+                attackerLevel += 1;
+                attackerUpgradeCost *= attackerBuyingCostMultiplier;
+                attackerLevelText.text = "x" + attackerLevel;
+                currentGoldPerAttack = baseGoldPerAttack * Mathf.Pow(attackerLevel, attackerGoldMultiplier);
             }
         }
         
