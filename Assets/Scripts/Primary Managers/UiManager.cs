@@ -38,7 +38,7 @@ namespace justDice_IdleClickerTest
         {
             btnGoldTap.onClick.AddListener(() => Managers.Instance.gameManager.AddGold(true));
             btnUpgradeLevel.onClick.AddListener(() => Managers.Instance.gameManager.UpgradeTapLevel());
-            btnResetAllSavedData.onClick.AddListener(() => Managers.Instance.dataManager.DeleteSavedPlayerData());
+            btnResetAllSavedData.onClick.AddListener(() => Managers.Instance.dataManager.DeleteAllSavedData());
             btnSettings.onClick.AddListener(() => { settingsPanel.SetActive(true); });
             btnSettings.onClick.AddListener(() => { settingsPanel.SetActive(true); });
             btnQuit.onClick.AddListener(() => { Application.Quit(); });

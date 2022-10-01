@@ -10,6 +10,7 @@ namespace justDice_IdleClickerTest
         [SerializeField] Animation cubeHitAnim;
         [SerializeField] ParticleSystem hammerHitParticles;
         [SerializeField] Rotator cubeRotator;
+        [SerializeField] GoldDropPool goldDropObjectPool;
         
         public void PlayTapEffects(bool isTappingGold)
         {
@@ -32,6 +33,8 @@ namespace justDice_IdleClickerTest
             {
                 cubeRotator.RandomizeAngles();
             }
+            
+            goldDropObjectPool.DropCoin();
         }
     }
 }

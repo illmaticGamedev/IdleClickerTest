@@ -17,16 +17,12 @@ namespace justDice_IdleClickerTest
         private void Awake()
         {
             playerDataSavePath = Path.Combine(Application.persistentDataPath, "playerData.bin");
-           
-            
             GamePlayerData = new PlayerData();
-
         }
 
         /// <summary>
         /// Saving data with binary formatter instead of the unity player pref system to avoid basic player hacks.
         /// </summary>
-
         public void SavePlayerData(long gold, int level, float attackerBuyCost)
         {
             GamePlayerData.Gold = gold;
@@ -68,6 +64,7 @@ namespace justDice_IdleClickerTest
         public AttackerData LoadAttackerData(int attackerIndex)
         {
             AttackerData attackerData = new AttackerData();
+            
             if (File.Exists(Path.Combine(Application.persistentDataPath, "attacker_" + attackerIndex + ".bin")))
             {
                 Stream loadStream = new FileStream(Path.Combine(Application.persistentDataPath, "attacker_" + attackerIndex + ".bin"), FileMode.Open);
@@ -80,12 +77,20 @@ namespace justDice_IdleClickerTest
         }
         
         [ContextMenu("DELETE ALL SAVED DATA")]
-        public void DeleteSavedPlayerData()
+        public void DeleteAllSavedData()
         {
             //Adding else to repeat the path so ContextMenu callback works without running the game.
             if (File.Exists(playerDataSavePath))
             {
                 File.Delete(playerDataSavePath);
+            }
+
+            for (int i = 1; i < 6; i++)
+            {
+                if (File.Exists(Path.Combine(Application.persistentDataPath, "attacker_" + i + ".bin")))
+                {
+                    File.Delete(Path.Combine(Application.persistentDataPath, "attacker_" + i + ".bin"));
+                }
             }
     
             PlayerPrefs.DeleteAll();

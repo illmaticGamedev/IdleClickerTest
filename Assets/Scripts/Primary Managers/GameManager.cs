@@ -19,9 +19,6 @@ namespace justDice_IdleClickerTest
         [SerializeField] int tapCurrentLevel;
         [SerializeField] float baseUpgradeCost;
         [SerializeField] float upgradeCostMultiplier;
-
-        [Header("References")]
-        [SerializeField] GoldDropPool goldDropObjectPool;
         
         void Start()
         {
@@ -76,7 +73,6 @@ namespace justDice_IdleClickerTest
             Managers.Instance.uIManager.SetCurrentGold(currentGold);
             Managers.Instance.effectsManager.PlayTapEffects(directHit);
             Managers.Instance.attackerManager.VerifyBudgetToBuyAttacker();
-            goldDropObjectPool.DropCoin();
             saveData();
         }
 

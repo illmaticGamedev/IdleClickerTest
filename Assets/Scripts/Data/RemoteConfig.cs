@@ -37,7 +37,7 @@ namespace justDice_IdleClickerTest
                     Managers.Instance.gameManager.LoadConfigFromRemoteFile();
                     Managers.Instance.uIManager.RemoveConfigFetchScreen(true);
                 }
-                catch (Exception e)
+                catch 
                 {
                     Managers.Instance.uIManager.RemoveConfigFetchScreen(false);
                     SetSettingsToDefaultValues();
