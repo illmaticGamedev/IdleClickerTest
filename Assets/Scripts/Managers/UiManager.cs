@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace justDice_IdleClickerTest
 {
-    public class UIController : Singleton<UIController>
+    public sealed class UiManager : MonoBehaviour
     {
         [Header("Gold and Tap")] 
         [SerializeField] TMP_Text txtCurrentGold;
@@ -36,33 +36,18 @@ namespace justDice_IdleClickerTest
         
         void setButtonEvents()
         {
-            btnGoldTap.onClick.AddListener(() => GameManager.Instance.CollectGoldOnTap());
-            btnUpgradeLevel.onClick.AddListener(() => GameManager.Instance.UpgradeTapLevel());
-            btnResetAllSavedData.onClick.AddListener(() => GameManager.Instance.DeleteAllPrefs());
-            btnSettings.onClick.AddListener(() =>
-            {
-                settingsPanel.SetActive(true);
-            });
-            
-            btnSettings.onClick.AddListener(() =>
-            {
-                settingsPanel.SetActive(true);
-            });
-            
-            btnQuit.onClick.AddListener(() =>
-            {
-                Application.Quit();
-            });
-            
-            btnCloseSettingsPanel.onClick.AddListener(() =>
-            {
-                settingsPanel.SetActive(false);
-            });
+            btnGoldTap.onClick.AddListener(() => Managers.Instance.gameManager.AddGold(true));
+            btnUpgradeLevel.onClick.AddListener(() => Managers.Instance.gameManager.UpgradeTapLevel());
+            btnResetAllSavedData.onClick.AddListener(() => Managers.Instance.dataManager.DeleteSavedPlayerData());
+            btnSettings.onClick.AddListener(() => { settingsPanel.SetActive(true); });
+            btnSettings.onClick.AddListener(() => { settingsPanel.SetActive(true); });
+            btnQuit.onClick.AddListener(() => { Application.Quit(); });
+            btnCloseSettingsPanel.onClick.AddListener(() => { settingsPanel.SetActive(false); });
         }
 
         void upgradeButtonState()
         {
-            if (GameManager.Instance.EnoughGoldForTapUpgrade())
+            if (Managers.Instance.gameManager.EnoughGoldForTapUpgrade())
             {
                 btnUpgradeLevel.interactable = true;
             }
@@ -78,14 +63,14 @@ namespace justDice_IdleClickerTest
             attackerAvailableBanner.SetActive(state);
         }
         
-        public void SetLevelText(double currentLevel)
+        public void SetLevelText(int currentLevel)
         {
             txtUpgradeLevel.text = "x" + currentLevel;
         }
 
-        public void SetCurrentGold(double currentGold)
+        public void SetCurrentGold(long currentGold)
         {
-            txtCurrentGold.text = Math.Round(currentGold).ToString();
+            txtCurrentGold.text = currentGold.ToString();
             upgradeButtonState();
         }
 

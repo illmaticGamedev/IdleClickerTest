@@ -6,10 +6,16 @@ using UnityEngine.Networking;
 
 namespace justDice_IdleClickerTest
 {
-    public class RemoteConfig : MonoBehaviour
+    public sealed class RemoteConfig : MonoBehaviour
     {
         private string fileURL = "https://drive.google.com/uc?export=download&id=12yER5n35P1xNOwIWBPXqiWilHee9wY57";
-        
+        public ConfigModel currentGameSettings;
+
+        private void Awake()
+        {
+            currentGameSettings = new ConfigModel();
+        }
+
         void Start()
         {
             StartCoroutine(GetConfig(fileURL));
@@ -18,7 +24,7 @@ namespace justDice_IdleClickerTest
 
         IEnumerator GetConfig(string url)
         {
-            yield return new WaitForSecondsRealtime(0.1f);
+            yield return new WaitForSecondsRealtime(0.2f);
             
             UnityWebRequest request = UnityWebRequest.Get(url);
             yield return request.SendWebRequest();
@@ -27,39 +33,53 @@ namespace justDice_IdleClickerTest
             {
                 try
                 {
-                    var newConfig = JsonConvert.DeserializeObject<ConfigModel>(request.downloadHandler.text);
-                    GameManager.Instance.LoadConfigFromRemoteFile(newConfig);
-                    UIController.Instance.RemoveConfigFetchScreen(true);
+                    currentGameSettings = JsonConvert.DeserializeObject<ConfigModel>(request.downloadHandler.text);
+                    Managers.Instance.gameManager.LoadConfigFromRemoteFile();
+                    Managers.Instance.uIManager.RemoveConfigFetchScreen(true);
                 }
                 catch (Exception e)
                 {
-                    Debug.Log("URL: " + fileURL);
-                    Debug.Log("Error: " + request.error);
-                    UIController.Instance.RemoveConfigFetchScreen(false);
+                    Managers.Instance.uIManager.RemoveConfigFetchScreen(false);
+                    SetSettingsToDefaultValues();
                 }
 
             }
             else
             {
                 Debug.Log("Error: " + request.error);
-                UIController.Instance.RemoveConfigFetchScreen(false);
+                Managers.Instance.uIManager.RemoveConfigFetchScreen(false);
+                SetSettingsToDefaultValues();
             }
+        }
+
+        public void SetSettingsToDefaultValues()
+        {
+            currentGameSettings.AttackerBaseBuyCost = ProjectConstants.BASE_ATTACKER_BUY_COST;
+            currentGameSettings.AttackerBuyingCostMultiplier =  ProjectConstants.ATTACKER_BUY_COST_MULTIPLIER;
+            currentGameSettings.BaseTapGold =  ProjectConstants.BASE_TAP_GOLD;
+            currentGameSettings.TapGoldSquaredValue =  ProjectConstants.TAP_GOLD_SQUARED_VALUE;
+            currentGameSettings.TapBaseUpgradeCost =  ProjectConstants.BASE_TAP_UPGRADE_COST;
+            currentGameSettings.TapUpgradeCostMultiplier =  ProjectConstants.TAP_UPGRADE_COST_MULTIPLIER;
+            currentGameSettings.AttackerBaseUpgradeCost =  ProjectConstants.ATTACKER_BASE_UPGRADE_COST;
+            currentGameSettings.AttackDelayTime =  ProjectConstants.ATTACKER_DELAY_TIME;
+            currentGameSettings.BaseAttackRewardGold =  ProjectConstants.BASE_ATTACK_REWARD_GOLD;
+            currentGameSettings.AttackGoldRewardMultiplier =  ProjectConstants.ATTACKER_GOLD_REWARD_MULTITPLIER;
         }
     }
 
-    // Model for json file in the remote config file - has to match all the elements,if wrong file, game will use default files.
+    // Model for json file in the remote config file - has to match all the elements. if wrong or invalid file, game will use default values.
     public struct ConfigModel
     {
-        public string BaseAttackRewardGold { get; set; }
-        public string AttackerBaseBuyCost { get; set; }
-        public string AttackerBuyingCostMultiplier { get; set; }
-        public string AttackDelayTime { get; set; }
-        public string AttackGoldRewardMultiplier { get; set; }
-        public string AttackerBaseUpgradeCost { get; set; }
-        public string BaseTapGold { get; set; }
-        public string TapGoldSquaredValue { get; set; }
-        public string TapBaseUpgradeCost { get; set; }
-        public string TapUpgradeCostMultiplier { get; set; }
+        public float BaseAttackRewardGold { get; set; }
+        public float AttackerBaseBuyCost { get; set; }
+        public float AttackerBuyingCostMultiplier { get; set; }
+        public float AttackDelayTime { get; set; }
+        public float AttackGoldRewardMultiplier { get; set; }
+        public float AttackerBaseUpgradeCost { get; set; }
+        public float BaseTapGold { get; set; }
+        public float TapGoldSquaredValue { get; set; }
+        public float TapBaseUpgradeCost { get; set; }
+        public float TapUpgradeCostMultiplier { get; set; }
     }
     
 }

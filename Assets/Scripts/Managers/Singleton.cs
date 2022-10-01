@@ -8,10 +8,10 @@ namespace justDice_IdleClickerTest
         
         public void Awake()
         {
-            if (Instance == null)
-            {
-                Instance = this as T;
-            }
+            if (Instance != null)
+                Destroy(gameObject);
+
+            Instance = this as T;
         }
     }
 }

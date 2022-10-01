@@ -4,7 +4,7 @@ namespace justDice_IdleClickerTest
 {
     public class BuyAttackerButton : MonoBehaviour
     {
-        [SerializeField] Attacker attacker;
+        public Attacker attacker;
 
         private void OnMouseDown()
         {
@@ -14,7 +14,7 @@ namespace justDice_IdleClickerTest
         void buyAttacker()
         {
             attacker.gameObject.SetActive(true);
-            GameManager.Instance.OnAttackerBought(this);
+            Managers.Instance.attackerManager.OnAttackerBought(this);
         }
         
     }

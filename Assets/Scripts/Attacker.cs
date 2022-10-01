@@ -1,11 +1,15 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 namespace justDice_IdleClickerTest
 {
     public class Attacker : MonoBehaviour
     {
+        // Indexing attacker to help save their data
+        [FormerlySerializedAs("AttackerNumber")] public int AttackerIndex;
+        
         [SerializeField] TrailRenderer shootTrail;
         [SerializeField] ParticleSystem trailHitParticles;
         [SerializeField] float arrowShootSpeed;
@@ -17,45 +21,22 @@ namespace justDice_IdleClickerTest
         private Vector3 trailStartPos;
         private Transform trailTransform;
         
-        //attack and gold logic
-        private float attackerBuyingCostMultiplier;
-        private float attackerAttackTimeDelay;
-        private double attackerUpgradeCost;
-        private float attackerGoldMultiplier;
+        //SaveData for attacker
+        [SerializeField] public int attackerLevel = 1;
+        [SerializeField] public float currentGoldPerAttack;
+        [SerializeField] public float attackerUpgradeCost;
         
-        private int attackerLevel = 1;
-        private double baseGoldPerAttack = 5;
-        private double currentGoldPerAttack;
-        
-        //PlayerPrefs - Strings for save;
-        private string beingUsed;
-        private string savedLevel;
-        private string savedUpgradeCost;
-        private string savedCurrentGoldPerAttack;
-
-        private void OnEnable()
-        {
-            // Connecting saved strings to the file name
-            var tra = transform;
-            beingUsed = tra.name + "_Alive";
-            savedLevel = tra.name + "_Level";
-            savedUpgradeCost = tra.name + "_UpgradeCost";
-            savedCurrentGoldPerAttack = tra.name + "_CurrentGoldPerAttack";
-        }
-
         private void Start()
         {
             preShootAnimation = GetComponent<Animation>();
             trailTransform = shootTrail.transform;
             trailStartPos = trailTransform.position;
             attackerLevelText.GetComponent<Renderer>().sortingOrder = 10;
-            checkRemoteDataOrSetToDefault();
-            InvokeRepeating(nameof(Attack), 0, attackerAttackTimeDelay);
-            currentGoldPerAttack = baseGoldPerAttack * Mathf.Pow(attackerLevel, attackerGoldMultiplier);
-            loadData();
         }
 
-        private void Update()
+        
+        //Shoot the projectile when attacker is being used.
+        void Update()
         {
             if (shootTrail.gameObject.activeInHierarchy)
             {
@@ -69,12 +50,12 @@ namespace justDice_IdleClickerTest
                     shootTrail.gameObject.SetActive(false);
                     shootTrail.emitting = false;
                     
-                    GameManager.Instance.CollectGoldOnTap(false, currentGoldPerAttack);
+                    Managers.Instance.gameManager.AddGold(false, (int)currentGoldPerAttack);
                     saveData();
                 }
             }
 
-            if (GameManager.Instance.currentGold >= attackerUpgradeCost)
+            if (Managers.Instance.gameManager.currentGold >= attackerUpgradeCost)
             {
                 upgradeIcon.SetActive(true);
             }
@@ -84,49 +65,37 @@ namespace justDice_IdleClickerTest
             }
         }
 
-        void Attack()
+        void attack()
         {
             shootTrail.transform.position = trailStartPos;
             preShootAnimation.Play();
             shootTrail.gameObject.SetActive(true);
             shootTrail.emitting = true;
         }
-
-        private void OnMouseDown()
+        
+        void OnMouseDown()
         {
-            UpgradeAttack();
+            upgradeAttack();
         }
-
-        void checkRemoteDataOrSetToDefault()
-        {
-            ConfigModel newConfig = GameManager.Instance._ConfigModel;
-            attackerUpgradeCost = float.Parse(newConfig.AttackerBaseUpgradeCost);
-            attackerAttackTimeDelay = float.Parse(newConfig.AttackDelayTime);
-            baseGoldPerAttack = float.Parse(newConfig.BaseAttackRewardGold);
-            attackerGoldMultiplier = float.Parse(newConfig.AttackGoldRewardMultiplier);
-            attackerBuyingCostMultiplier = float.Parse(newConfig.AttackerBuyingCostMultiplier);
-            
-            currentGoldPerAttack = baseGoldPerAttack * Mathf.Pow(attackerLevel, attackerGoldMultiplier);
-        }
-    
+        
         void saveData()
         {
-            //Saving Everything that is required to restart at the same stats
-            PlayerPrefs.SetString(beingUsed, "true");
-            PlayerPrefs.SetInt(savedLevel, attackerLevel);
-            PlayerPrefs.SetString(savedUpgradeCost, attackerUpgradeCost.ToString());
-            PlayerPrefs.SetString(savedCurrentGoldPerAttack, currentGoldPerAttack.ToString());
+            Managers.Instance.attackerManager.SaveAttackerData(AttackerIndex, attackerLevel, attackerUpgradeCost, currentGoldPerAttack);
         }
 
         void loadData()
         {
-            if (PlayerPrefs.GetString(beingUsed) == "true")
+            var myAttackerData = Managers.Instance.attackerManager.LoadAttackerData(AttackerIndex);
+            
+            if (myAttackerData.Level > 0)
             {
-                attackerLevel = PlayerPrefs.GetInt(savedLevel, 1);
-                attackerUpgradeCost = float.Parse(PlayerPrefs.GetString(savedUpgradeCost));
-                currentGoldPerAttack = float.Parse(PlayerPrefs.GetString(savedCurrentGoldPerAttack));
+                Debug.Log("Attacker Already Being Used");
+                attackerLevel = myAttackerData.Level;
+                attackerUpgradeCost =  myAttackerData.UpgradeCost;
+                currentGoldPerAttack =  myAttackerData.GoldPerAttack;
+                
                 attackerLevelText.text = "x" + attackerLevel;
-                currentGoldPerAttack = baseGoldPerAttack * Mathf.Pow(attackerLevel, attackerGoldMultiplier);
+                currentGoldPerAttack = (long)(Managers.Instance.attackerManager.baseGoldPerAttack * Mathf.Pow(attackerLevel, Managers.Instance.attackerManager.attackerGoldMultiplier));
                 Destroy(relatedButton);
             }
             else
@@ -135,17 +104,24 @@ namespace justDice_IdleClickerTest
             }
         }
         
-        public void UpgradeAttack()
+        void upgradeAttack()
         {
-            if(GameManager.Instance.currentGold >= attackerUpgradeCost)
+            if(Managers.Instance.gameManager.currentGold >= attackerUpgradeCost)
             {
-                GameManager.Instance.UpdateGold(-attackerUpgradeCost);
+                Managers.Instance.gameManager.UpdateGold(-(int) attackerUpgradeCost);
                 
                 attackerLevel += 1;
-                attackerUpgradeCost *= attackerBuyingCostMultiplier;
+                attackerUpgradeCost *= (int)Managers.Instance.attackerManager.attackerBuyingCostMultiplier;
                 attackerLevelText.text = "x" + attackerLevel;
-                currentGoldPerAttack = baseGoldPerAttack * Mathf.Pow(attackerLevel, attackerGoldMultiplier);
+                currentGoldPerAttack = (long)(Managers.Instance.attackerManager.baseGoldPerAttack * Mathf.Pow(attackerLevel, Managers.Instance.attackerManager.attackerGoldMultiplier));
             }
+        }
+        
+        public void StartAttacks()
+        {
+            currentGoldPerAttack = (int)(Managers.Instance.attackerManager.baseGoldPerAttack * Mathf.Pow(attackerLevel, Managers.Instance.attackerManager.attackerGoldMultiplier));
+            loadData();
+            InvokeRepeating(nameof(attack), Random.Range(0,1f), Managers.Instance.attackerManager.attackerAttackTimeDelay);
         }
         
     }
